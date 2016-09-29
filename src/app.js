@@ -23,12 +23,13 @@ while (cards.length > 0) {
 
 canvas.onclick = function(event) {
   event.preventDefault();
-  event.clientX
 
   for (let i=0; i<board.length; i++) {
       let cardX = (i%6)*100+1;
       let cardY = (i/6|0)*100+1;
   }
+
+
   // TODO: determine which card was clicked on
   // TODO: determine what to do
 }
