@@ -19,20 +19,44 @@ while (cards.length > 0) {
     cards.splice(index, 1);
 }
 
-// TODO: Place the cards on the board in random order
+function getCard(event) {
+    for (let i=0; i<board.length; i++) {
+        let cardX = (i%6)*100+1;
+        let cardY = (i/6|0)*100+1;
+        if (event.offsetX > cardX && event.offsetX <= cardX + 98 &&
+            event.offsetY > cardY && event.offsetY <= cardY + 98) {
+            return board[i];
 
-canvas.onclick = function(event) {
-  event.preventDefault();
-
-  for (let i=0; i<board.length; i++) {
-      let cardX = (i%6)*100+1;
-      let cardY = (i/6|0)*100+1;
-  }
-
-
-  // TODO: determine which card was clicked on
-  // TODO: determine what to do
+        }
+    }
+    event.preventDefault();
+    return null;
 }
+
+let foundCards = new Set();
+
+function *clicker() {
+    while (true) {
+        let card1, card2;
+        while ((card1 = getCard(yield)) === null || foundCards.has(card1.card));
+        card1.flip = true;
+        while ((card2 = getCard(yield)) === null || card2 === card1 || foundCards.has(card2.card));
+        card2.flip = true;
+
+        if (card1.card !== card2.card) {
+            setTimeout(()=>{
+                card1.flip = card2.flip = false;
+            }, 300)
+        } else {
+            foundCards.add(card1.card)
+        }
+        if (foundCards.length === cards.length / 2 ) {
+            console.log('winner')
+        }
+    }
+}
+let clickerFunc = clicker()
+canvas.onclick = (event)=>clickerFunc.next(event)
 
 /**
  * @function masterLoop
@@ -46,14 +70,7 @@ var masterLoop = function(timestamp) {
 masterLoop(performance.now());
 
 
-/**
- * @function update
- * Updates the game state, moving
- * game objects and handling interactions
- * between them.
- * @param {DOMHighResTimeStamp} elapsedTime indicates
- * the number of milliseconds passed since the last frame.
- */
+
 function update(elapsedTime) {
 
 }
